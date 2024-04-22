@@ -1,0 +1,15 @@
+# Dependencias instaladas por npm
+/node_modules
+
+# Archivos de dependencias o de configuración generados automáticamente
+npm-debug.log
+yarn-error.log
+.env
+.replit
+replit_zip_error_log.txt
+
+# Directorio de archivos compilados
+/build
+
+# Cualquier otro archivo o directorio específico de tu proyecto que no deseas rastrear con Git
+# Por ejemplo, archivos de datos locales, archivos temporales, etc.

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>Habitabilidad</title>
+  
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background-color: black;
+      
+    }
+
+    h1 {
+      color: #333;
+    }
+
+    #myCanvas {
+      border: 1px solid #000;
+      background-color: #fff;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    #mensaje {
+      display: none;
+      position: absolute;
+      color: white;
+      padding: 5px;
+      border-radius: 5px;
+      background-color: #333;
+    }
+  </style>
+</head>
+<body>
+	<h1 style="color:white" >Habitabilidad</h1>
+
+  <canvas id="myCanvas" width="900" height="1000" style="border:1px solid #000000;">
+  </canvas>
+  <div id="mensaje" style="display: none; position: absolute; background-color: coral; color: lightblue; padding: 5px;"></div>
+   <div id="sugerencia" style="display: none; position: absolute; backgroundColor: yellow; color:black; padding: 5px;"></div>
+  
+  <script>
+    const canvas = document.getElementById("myCanvas");
+    const ctx = canvas.getContext("2d");
+
+    var habitacionesString = '<%= JSON.stringify(habitacionesSimplificadas) %>';
+    habitacionesString = habitacionesString.replace(/&#34;/g, '"');
+    const habitaciones = JSON.parse(habitacionesString);
+
+    // Función para dibujar una línea entre dos puntos
+    function drawLine(startX, startY, endX, endY) {
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+      ctx.lineTo(endX, endY);
+      ctx.stroke();
+    }
+
+    // Función para obtener las coordenadas de un piso específico
+    function obtenerCoordenadasPiso(piso) {
+      const piso1Y = 600;
+      const piso2Y = 400;
+      const piso3Y = 200;
+      
+      return piso === 1 ? piso1Y : piso === 2 ? piso2Y : piso === 3 ? piso3Y : 0;
+    }
+
+    // Función para obtener las coordenadas en X
+    function obtenerCoordenadaX(numeroHabitacion) {
+      // Definir el mapeo de posiciones en X para cada número de habitación
+      const xPositions = {
+        1: 200,
+        2: 500,
+        3: 650,
+        4: 350
+      };
+      
+      return xPositions[numeroHabitacion] || 0;
+    }
+
+    // Función para obtener las coordenadas en Y
+    function obtenerCoordenadaY(piso, numeroHabitacion) {
+      const baseY = obtenerCoordenadasPiso(piso);
+      const offsetVertical = numeroHabitacion > 2 ? 70 : 0;
+      return baseY - offsetVertical;
+    }
+
+    // Mapeo de números a colores
+    var colorMapping = {
+      1: "red",
+      2: "green",
+      3: "blue",
+      4: "yellow",
+    };
+
+    // Función para dibujar un círculo en una posición
+    function drawCircle(x, y, radius, color) {
+
+     
+      
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, 2 * Math.PI);
+      ctx.fillStyle = color || "white"; // Usa el color proporcionado o blanco por defecto
+      ctx.fill();
+      ctx.strokeStyle = "black";
+      ctx.stroke();
+
+      
+    }
+
+    // Función para dibujar el grafo
+    function dibujarGrafo() {
+      Object.values(habitaciones).forEach((habitacion) => {
+        let piso = parseInt(habitacion.numero.charAt(0));
+        let numeroHabitacion = parseInt(habitacion.numero.charAt(2));
+
+        // Ajusta las coordenadas en X y Y
+        let startX = obtenerCoordenadaX(numeroHabitacion);
+        let startY = obtenerCoordenadaY(piso, numeroHabitacion);
+
+        habitacion.conexiones.forEach((conexion) => {
+        let conexionPiso = parseInt(conexion.charAt(0));
+        let conexionNumero = parseInt(conexion.charAt(2));
+
+        // Ajusta las coordenadas en X y Y para las conexiones
+        let endX = obtenerCoordenadaX(conexionNumero);
+        let endY = obtenerCoordenadaY(conexionPiso, conexionNumero);
+
+        drawLine(startX, startY, endX, endY);
+          
+        });
+
+       
+        
+      }); 
+       // Dibuja un círculo en la posición del nodo
+      Object.values(habitaciones).forEach((habitacion) => {
+        let piso = parseInt(habitacion.numero.charAt(0));
+        let numeroHabitacion = parseInt(habitacion.numero.charAt(2));
+
+        let startX = obtenerCoordenadaX(numeroHabitacion);
+        let startY = obtenerCoordenadaY(piso, numeroHabitacion);
+
+        drawCircle(startX, startY, 20, habitacion.color);
+      });
+    }
+
+    function mostrarMensaje(event) {
+      let rect = canvas.getBoundingClientRect();
+      let mensajeElement = document.getElementById('mensaje');
+      let sugerencia = document.getElementById('sugerencia');
+
+      let x = event.clientX - rect.left;
+      let y = event.clientY - rect.top;
+
+      let mensajeMostrado = false;
+      
+      Object.values(habitaciones).forEach((habitacion) => {
+    
+        let piso = parseInt(habitacion.numero.charAt(0));
+        let numeroHabitacion = parseInt(habitacion.numero.charAt(2));
+
+        let startX = obtenerCoordenadaX(numeroHabitacion);
+        let startY = obtenerCoordenadaY(piso, numeroHabitacion);
+
+        let startY2 = startY+20;
+        
+        let distancia = Math.sqrt(Math.pow((x - startX),2) + Math.pow((y - startY),2));
+        
+        if (distancia <= 20 && !mensajeMostrado) {
+          mensajeElement.style.display = 'block';
+          mensajeElement.innerText = "Temperatura: " + habitacion.temperatura + "°C / " + habitacion.mensaje+"/ Sugerencia: "+habitacion.sugerencia;
+
+          mensajeElement.style.left = startX + 'px';
+          mensajeElement.style.top = startY + 'px';
+          mensajeElement.style.backgroundColor = habitacion.color;
+          mensajeMostrado = true; 
+
+          sugerencia.style.top = startY2 + 'px';
+          sugerencia.innerText = "Sugerencia: "+ habitacion.sugerencia;
+        }
+        
+      });
+
+      if (!mensajeMostrado) {
+        mensajeElement.style.display = 'none';
+      }
+
+    }
+
+    // Llama a la función para dibujar el grafo
+    dibujarGrafo();
+    // Configura el evento de clic en el canvas
+    canvas.addEventListener('mousemove', mostrarMensaje);
+  </script>
+</body>
+</html>

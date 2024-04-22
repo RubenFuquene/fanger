@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Formulario para calcular PMV</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1 {
+      color: #333;
+      text-align: center;
+    }
+
+    form {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    select,
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 16px;
+      box-sizing: border-box;
+    }
+
+    input[type="submit"] {
+      background-color: #4caf50;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    input[type="submit"]:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <h1>Formulario para calcular PMV</h1>
+
+  <form action="/calcular_pmv" method="post">
+    <label for="ropa">Tipo de ropa:</label>
+    <select name="ropa" id="ropa">
+      <option value="0">Desnudo</option>
+      <option value="0.5">Ropa ligera (Ropa verano)</option>
+      <option value="1">Ropa media (Traje completo)</option>
+      <option value="1.5">Ropa pesada (Traje militar de invierno)</option>
+    </select>
+
+    <br>
+
+    <label for="tasaMetabolica">Tasa metabólica:</label>
+    <select name="tasaMetabolica" id="tasaMetabolica">
+      <option value="1.12">Descanso</option>
+      <option value="1.72">Baja</option>
+      <option value="2.83">Moderada</option>
+      <option value="3.95">Alta</option>
+      <option value="4.47">Muy alta</option>
+    </select>
+
+    <br>
+
+    <label for="temperatura">Temperatura (°C):</label>
+    <input type="number" name="temperatura" id="temperatura" required>
+
+    <br>
+
+    <label for="humedad">Humedad Relativa (%):</label>
+    <input type="number" name="humedad" id="humedad" required>
+
+    <br>
+
+    <label for="velocidadAire">Velocidad del Aire (m/s):</label>
+    <input name="velocidadAire" id="velocidadAire" required>
+
+    <br>
+
+    <input type="submit" value="Calcular PMV">
+  </form>
+</body>
+</html>
